@@ -8,6 +8,7 @@ import com.example.chatx.view.Chat
 import com.example.chatx.view.Home
 import com.example.chatx.view.Signin
 import com.example.chatx.view.SplashScreen
+import com.example.chatx.view.StartChatScreen
 
 @Composable
 fun AppNavigator(){
@@ -17,6 +18,7 @@ fun AppNavigator(){
         composable("splash_screen"){ SplashScreen(navController) }
         composable("signin"){ Signin(navController) }
         composable("home"){ Home(navController) }
+        composable("start_chat"){ StartChatScreen(navController) }
         composable("chat/{userId}"){backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
             Chat(navController ,userId = userId)

@@ -21,11 +21,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.chatx.viewmodel.SplashViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController){
+fun SplashScreen(navController: NavController, viewModel: SplashViewModel = viewModel()){
     val scale = remember {
         Animatable(0f)
     }
@@ -33,17 +35,24 @@ fun SplashScreen(navController: NavController){
         scale.animateTo(
             targetValue = 0.3f,
             animationSpec = tween(
-                durationMillis = 500,
+                durationMillis = 1000,
                 easing = {
                     OvershootInterpolator(2f).getInterpolation(it)
                 }
             )
         )
         delay(3000L)
-        navController.navigate("signin") {
-            popUpTo("splash_screen") { inclusive = true }
+        val isLoggedIn = viewModel.isUserLoggedIn()
+        if (isLoggedIn){
+            navController.navigate("home") {
+                popUpTo("splash_screen") { inclusive = true }
         }
 
+        }else{
+            navController.navigate("signin") {
+                popUpTo("splash_screen") { inclusive = true }
+            }
+        }
     }
     Column  (
         horizontalAlignment = Alignment.CenterHorizontally,

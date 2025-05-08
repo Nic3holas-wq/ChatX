@@ -1,20 +1,26 @@
 package com.example.chatx.view
 
+import android.R.attr.onClick
 import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.WhitePoint
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,11 +36,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.chatx.model.data.AppDatabase
+import com.example.chatx.model.data.User
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,6 +59,13 @@ fun Signin(navController: NavHostController) {
     val phoneNumber = remember { mutableStateOf("") }
     val otp = remember { mutableStateOf("") }
     val verificationId = remember { mutableStateOf<String?>(null) }
+    var isLoading by remember{ mutableStateOf(false)}
+    var otpSent  by remember { mutableStateOf(false) }
+    val instructionText = if (otpSent) "Enter OTP" else "To continue, enter phone number to create account"
+
+    val db = AppDatabase.getInstance(context)
+    val userDao = db.userDao()
+
 
     fun sendVerificationCode() {
         val activity = context as? Activity
@@ -55,9 +76,14 @@ fun Signin(navController: NavHostController) {
                 .setActivity(activity)
                 .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                        isLoading = false
+                        otpSent = true
                         auth.signInWithCredential(credential)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        userDao.insertUser(User(phone = "+254${phoneNumber.value}", isLoggedIn = true))
+                                    }
                                     navController.navigate("home") {
                                         popUpTo("signin") { inclusive = true }
                                     }
@@ -66,11 +92,13 @@ fun Signin(navController: NavHostController) {
                     }
 
                     override fun onVerificationFailed(e: FirebaseException) {
+                        isLoading = false
                         Toast.makeText(context, "Verification failed: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-
                     override fun onCodeSent(verificationIdParam: String, token: PhoneAuthProvider.ForceResendingToken) {
                         verificationId.value = verificationIdParam
+                        isLoading = false
+                        otpSent = true
                     }
                 })
                 .build()
@@ -80,11 +108,35 @@ fun Signin(navController: NavHostController) {
         }
     }
 
+    fun createUserDoc(){
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.let { user ->
+            val userDoc = Firebase.firestore.collection("users").document(user.uid)
+            userDoc.get().addOnSuccessListener { document ->
+                if (!document.exists()) {
+                    // Create user document
+                    val newUser = mapOf(
+                        "uid" to user.uid,
+                        "phoneNumber" to user.phoneNumber,
+                        "name" to "Username", // optional placeholder
+                        "profileImageUrl" to "" // optional placeholder
+                    )
+                    userDoc.set(newUser)
+                }
+            }
+        }
+
+    }
     fun verifyCode() {
         val credential = PhoneAuthProvider.getCredential(verificationId.value!!, otp.value)
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
+                isLoading = false
                 if (task.isSuccessful) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userDao.insertUser(User(phone = "+254${phoneNumber.value}", isLoggedIn = true))
+                        createUserDoc()
+                    }
                     navController.navigate("home") {
                         popUpTo("signin") { inclusive = true }
                     }
@@ -93,6 +145,7 @@ fun Signin(navController: NavHostController) {
                 }
             }
     }
+
 
     Column(
         modifier = Modifier
@@ -114,40 +167,11 @@ fun Signin(navController: NavHostController) {
             fontWeight = FontWeight.SemiBold
         )
         Text(
-            text = "To continue, enter phone number to create account",
+            text = instructionText,
             color = Color.Black,
             fontSize = 16.sp
         )
-        OutlinedTextField(
-            modifier = Modifier.padding(20.dp),
-            value = phoneNumber.value,
-            label = { Text("Phone Number") },
-            textStyle = TextStyle(fontSize = 24.sp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFF0096C7),
-                unfocusedBorderColor = Color.Gray,
-                focusedTextColor = Color.Black,
-                cursorColor = Color(0xFF0096C7),
-                focusedLabelColor = Color(0xFF0096C7)
-            ),
-            onValueChange = {
-                if (it.length <= 10 && it.all { char -> char.isDigit() }) {
-                    phoneNumber.value = it
-                }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            singleLine = true
-        )
-        Button(
-            onClick = { sendVerificationCode() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0096C7),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text("Send OTP", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-        }
+
 
         if (verificationId.value != null) {
             OutlinedTextField(
@@ -155,16 +179,116 @@ fun Signin(navController: NavHostController) {
                 onValueChange = { if (it.length <= 6) otp.value = it },
                 label = { Text("Enter OTP") },
                 textStyle = TextStyle(fontSize = 24.sp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF0096C7),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedTextColor = Color.Black,
+                    cursorColor = Color(0xFF0096C7),
+                    focusedLabelColor = Color(0xFF0096C7)
+                ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
             Button(
-                onClick = { verifyCode() },
+                onClick = {
+                    verifyCode()
+                    isLoading = true
+                          },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0096C7)),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Verify", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                if (isLoading){
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(25.dp)
+                                .padding(end = 8.dp)
+                                .align(Alignment.CenterVertically),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            "Please wait...",
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically),
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                } else {
+                    Text("Verify", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                }
+
+            }
+        }else {
+            OutlinedTextField(
+                modifier = Modifier.padding(20.dp),
+                value = phoneNumber.value,
+                label = { Text("Phone Number") },
+                textStyle = TextStyle(fontSize = 24.sp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF0096C7),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedTextColor = Color.Black,
+                    cursorColor = Color(0xFF0096C7),
+                    focusedLabelColor = Color(0xFF0096C7)
+                ),
+                onValueChange = {
+                    if (it.length <= 10 && it.all { char -> char.isDigit() }) {
+                        phoneNumber.value = it
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                singleLine = true
+            )
+            Button(
+                onClick = {
+                    if(!isLoading){
+                        isLoading = true
+                        sendVerificationCode()
+
+                    }
+                },
+                enabled = !isLoading,
+
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0096C7),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                if(isLoading){
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(25.dp)
+                                .padding(end = 8.dp)
+                                .align(Alignment.CenterVertically),
+                            color = Color(0xFF0096C7),
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            "Sending...",
+                            color = Color(0xFF0096C7),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+
+                } else{
+                    Text("Send OTP", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                }
             }
         }
     }
