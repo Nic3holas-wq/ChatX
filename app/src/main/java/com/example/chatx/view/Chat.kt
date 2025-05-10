@@ -51,6 +51,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -234,7 +235,7 @@ fun Chat(navController: NavHostController, userId: String?) {
                         ) {
                             Text(
                                 text = message.content,
-                                color = Color.White,
+                                color = Color.Black,
                                 fontSize = 14.sp
                             )
                             val formatted = message.timestamp?.toDate()?.let {
@@ -244,7 +245,8 @@ fun Chat(navController: NavHostController, userId: String?) {
                             Text(
                                     text = formatted,
                                     fontSize = 12.sp,
-                                    color = Color.White
+                                    color = Color.Black,
+                                fontWeight = FontWeight.Light
                                 )
                         }
                     }

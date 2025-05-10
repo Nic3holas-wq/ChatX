@@ -65,7 +65,7 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = viewModel(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
-                HomeDropdownMenu()
+                HomeDropdownMenu(navController)
             }
 
             // Chat List
@@ -154,7 +154,7 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = viewModel(
 }
 
 @Composable
-fun HomeDropdownMenu() {
+fun HomeDropdownMenu(navController: NavHostController) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
@@ -176,7 +176,7 @@ fun HomeDropdownMenu() {
             DropdownMenuItem(
                 text = { Text("Account") },
                 onClick = {
-                    Toast.makeText(context, "Account Info", Toast.LENGTH_LONG).show()
+                    navController.navigate("account_info")
                 }
             )
             DropdownMenuItem(

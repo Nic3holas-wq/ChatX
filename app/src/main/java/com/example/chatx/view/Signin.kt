@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -65,7 +66,6 @@ fun Signin(navController: NavHostController) {
 
     val db = AppDatabase.getInstance(context)
     val userDao = db.userDao()
-
 
     fun sendVerificationCode() {
         val activity = context as? Activity
@@ -156,19 +156,19 @@ fun Signin(navController: NavHostController) {
     ) {
         Text(
             text = "ChatX",
-            color = Color(0xFF0096C7),
+            color = MaterialTheme.colorScheme.primary,
             fontSize = 34.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
             text = "Welcome!",
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 22.sp,
             fontWeight = FontWeight.SemiBold
         )
         Text(
             text = instructionText,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 16.sp
         )
 
@@ -180,11 +180,11 @@ fun Signin(navController: NavHostController) {
                 label = { Text("Enter OTP") },
                 textStyle = TextStyle(fontSize = 24.sp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF0096C7),
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color.Gray,
-                    focusedTextColor = Color.Black,
-                    cursorColor = Color(0xFF0096C7),
-                    focusedLabelColor = Color(0xFF0096C7)
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
@@ -195,7 +195,7 @@ fun Signin(navController: NavHostController) {
                     verifyCode()
                     isLoading = true
                           },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0096C7)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 if (isLoading){
@@ -233,11 +233,11 @@ fun Signin(navController: NavHostController) {
                 label = { Text("Phone Number") },
                 textStyle = TextStyle(fontSize = 24.sp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF0096C7),
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color.Gray,
-                    focusedTextColor = Color.Black,
-                    cursorColor = Color(0xFF0096C7),
-                    focusedLabelColor = Color(0xFF0096C7)
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
                 ),
                 onValueChange = {
                     if (it.length <= 10 && it.all { char -> char.isDigit() }) {
@@ -258,7 +258,7 @@ fun Signin(navController: NavHostController) {
                 enabled = !isLoading,
 
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0096C7),
+                    containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
@@ -273,12 +273,12 @@ fun Signin(navController: NavHostController) {
                                 .size(25.dp)
                                 .padding(end = 8.dp)
                                 .align(Alignment.CenterVertically),
-                            color = Color(0xFF0096C7),
+                            color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 2.dp
                         )
                         Text(
                             "Sending...",
-                            color = Color(0xFF0096C7),
+                            color = MaterialTheme.colorScheme.primary,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
