@@ -25,6 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -98,13 +99,15 @@ fun Account(navController: NavHostController, viewModel: UserViewModel = viewMod
     }
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .padding(top = 30.dp)
             .fillMaxSize()
+
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF0096C7),
+                .background(MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(
                         topStart = 0.dp,
                         topEnd = 0.dp,

@@ -1,8 +1,8 @@
 package com.example.chatx.view
 
-import android.widget.Space
-import android.widget.Toast
 import com.example.chatx.R
+import android.media.MediaPlayer
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +33,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -68,6 +69,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Chat(navController: NavHostController, userId: String?) {
+    val context = LocalContext.current
+    val mediaPlayer = remember { MediaPlayer.create(context, R.raw.message_sound) }
+
     if (userId == null) {
         LaunchedEffect(Unit) {
             navController.navigate("home")
@@ -138,12 +142,15 @@ fun Chat(navController: NavHostController, userId: String?) {
                 SetOptions.merge()
             ).addOnSuccessListener {
                 messageRef.set(messageData)
+                //play a sound when a message is sent
+                mediaPlayer.start()
             }
         }
     }
 
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
             .padding(top = 30.dp, bottom = 10.dp)
             .imePadding()
@@ -152,7 +159,7 @@ fun Chat(navController: NavHostController, userId: String?) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)
-                .background(Color(0xFF0096C7)),
+                .background(MaterialTheme.colorScheme.primary),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -193,13 +200,13 @@ fun Chat(navController: NavHostController, userId: String?) {
                 ) {
                     recipientInfo?.let {
                         Text(
-                            text = it.name,
+                            text = it.phoneNumber,
                             color = Color.White,
                             fontSize = 16.sp
                         )
                         Text(
                             text = "Online",
-                            color = Color.Green
+                            color = Color.White
                         )
                     }
 
@@ -219,7 +226,7 @@ fun Chat(navController: NavHostController, userId: String?) {
             ) {
                 items(messagesState.reversed()) { message ->
                     val isMe = message.senderId == currentUserId
-                    val backgroundColor = if (isMe) Color(0xFF0096C7) else Color.LightGray
+                    val backgroundColor = if (isMe) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary
                     val alignment = if (isMe) Alignment.CenterEnd else Alignment.CenterStart
 
                     Box(
@@ -235,7 +242,7 @@ fun Chat(navController: NavHostController, userId: String?) {
                         ) {
                             Text(
                                 text = message.content,
-                                color = Color.Black,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 14.sp
                             )
                             val formatted = message.timestamp?.toDate()?.let {
@@ -245,7 +252,7 @@ fun Chat(navController: NavHostController, userId: String?) {
                             Text(
                                     text = formatted,
                                     fontSize = 12.sp,
-                                    color = Color.Black,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                 fontWeight = FontWeight.Light
                                 )
                         }
@@ -282,7 +289,7 @@ fun Chat(navController: NavHostController, userId: String?) {
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            if (textMsg.isNotBlank()) Color(0xFF0096C7) else Color.Gray,
+                            if (textMsg.isNotBlank()) MaterialTheme.colorScheme.primary else Color.Gray,
                             shape = CircleShape
                         )
                         .then(

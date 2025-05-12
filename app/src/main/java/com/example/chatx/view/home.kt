@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.chatx.R
 import com.example.chatx.viewmodel.HomeViewModel
+import com.example.chatx.viewmodel.SettingsViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +36,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun Home(navController: NavHostController, viewModel: HomeViewModel = viewModel()) {
     val chatItems = viewModel.chatList
     val user = FirebaseAuth.getInstance().currentUser
+    val settingsViewModel: SettingsViewModel = viewModel()
 
     LaunchedEffect(true) {
         if (user == null) {
@@ -46,7 +48,9 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = viewModel(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
         ) {
             // Top Bar
             Row(
@@ -54,14 +58,14 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = viewModel(
                     .fillMaxWidth()
                     .height(100.dp)
                     .padding(top = 30.dp)
-                    .background(Color(0xFF0096C7)),
+                    .background(MaterialTheme.colorScheme.primary),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     text = "ChatX",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -106,17 +110,19 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = viewModel(
                                 .weight(1f)
                                 .padding(start = 8.dp)
                         ) {
-                            val displayName = if (chatItem.user.name.isEmpty()){
-                                chatItem.user.phoneNumber
-                            }else{
-                                chatItem.user.name
-                            }
+//                            val displayName = if (chatItem.user.name.isEmpty()){
+//                                chatItem.user.phoneNumber
+//                            }else{
+//                                chatItem.user.name
+//                            }
                             Text(
-                                text = displayName,
+                                text = chatItem.user.name,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = chatItem.lastMessage.text,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 14.sp
                             )
                         }
@@ -182,19 +188,19 @@ fun HomeDropdownMenu(navController: NavHostController) {
             DropdownMenuItem(
                 text = { Text("Create Group") },
                 onClick = {
-                    Toast.makeText(context, "Group Created", Toast.LENGTH_LONG).show()
+                    navController.navigate("create_group")
                 }
             )
             DropdownMenuItem(
                 text = { Text("Settings") },
                 onClick = {
-                    Toast.makeText(context, "Setting Changed", Toast.LENGTH_LONG).show()
+                    navController.navigate("settings")
                 }
             )
             DropdownMenuItem(
                 text = { Text("Theme") },
                 onClick = {
-                    Toast.makeText(context, "Theme Changed", Toast.LENGTH_LONG).show()
+                    navController.navigate("theme")
                 }
             )
         }

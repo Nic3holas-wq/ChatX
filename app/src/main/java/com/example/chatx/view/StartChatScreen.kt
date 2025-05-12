@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -43,6 +44,7 @@ fun StartChatScreen(navController: NavHostController, viewModel: HomeViewModel =
 
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
             .padding(top = 40.dp)
     ) {
@@ -50,7 +52,7 @@ fun StartChatScreen(navController: NavHostController, viewModel: HomeViewModel =
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .background(Color(0xFF0096C7)),
+                .background(MaterialTheme.colorScheme.primary),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
@@ -103,8 +105,8 @@ fun StartChatScreen(navController: NavHostController, viewModel: HomeViewModel =
                             .clip(CircleShape)
                     )
                     Column(modifier = Modifier.padding(start = 8.dp)) {
-                        Text(text = user.phoneNumber, fontSize = 20.sp, fontWeight = FontWeight.Normal)
-                        Text(text = user.name, fontSize = 16.sp,fontWeight = FontWeight.Light)
+                        Text(text = user.phoneNumber, color = MaterialTheme.colorScheme.onBackground, fontSize = 20.sp, fontWeight = FontWeight.Normal)
+                        Text(text = user.name,color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp,fontWeight = FontWeight.Light)
                     }
                 }
             }

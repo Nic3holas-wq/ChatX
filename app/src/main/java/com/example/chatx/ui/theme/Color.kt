@@ -5,10 +5,10 @@ import androidx.compose.ui.graphics.Color
 val lightPrimary = Color(0xFF0096C7)
 val lightBackground = Color.White
 val lightOnPrimary = Color.White
-val lightOnBackground = Color.Black
+val lightOnBackground = Color(0x99000000)
 
 //darkmode
-val darkPrimary = Color(0xFF90CAF9)
-val darkBackground = Color(0xFF121212)
-val darkOnPrimary = Color.Black
+val darkPrimary = Color(0x99000000)
+val darkBackground = Color(0xCC000000)
+val darkOnPrimary = Color(0xCC000000)
 val darkOnBackground = Color.White

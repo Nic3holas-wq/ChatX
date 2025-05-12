@@ -6,10 +6,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chatx.view.Account
 import com.example.chatx.view.Chat
+import com.example.chatx.view.CreateGroup
 import com.example.chatx.view.Home
+import com.example.chatx.view.Settings
 import com.example.chatx.view.Signin
 import com.example.chatx.view.SplashScreen
 import com.example.chatx.view.StartChatScreen
+import com.example.chatx.view.Themes
 
 @Composable
 fun AppNavigator(){
@@ -21,6 +24,9 @@ fun AppNavigator(){
         composable("home"){ Home(navController) }
         composable("start_chat"){ StartChatScreen(navController) }
         composable("account_info"){ Account(navController) }
+        composable("create_group"){ CreateGroup(navController) }
+        composable("settings"){ Settings(navController) }
+        composable("theme"){ Themes(navController) }
         composable("chat/{userId}"){backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
             Chat(navController ,userId = userId)

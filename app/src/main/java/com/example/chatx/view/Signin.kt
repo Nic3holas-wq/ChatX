@@ -3,6 +3,7 @@ package com.example.chatx.view
 import android.R.attr.onClick
 import android.app.Activity
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -149,6 +150,7 @@ fun Signin(navController: NavHostController) {
 
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .padding(top = 80.dp, start = 5.dp, end = 5.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(5.dp),

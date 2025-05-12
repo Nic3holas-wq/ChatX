@@ -5,8 +5,6 @@ import android.graphics.Color
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -14,38 +12,31 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
+private val DarkColorPalette = darkColorScheme(
     primary = darkPrimary,
     background = darkBackground,
-    onPrimary = darkPrimary,
-    onBackground = darkBackground
+    onPrimary = darkOnPrimary,
+    onBackground = darkOnBackground
 
 )
 
-private val LightColorScheme = lightColorScheme(
+private val LightColorPalette = lightColorScheme(
     primary = lightPrimary,
     background = lightBackground,
-    onPrimary = lightPrimary,
-    onBackground = lightBackground
+    onPrimary = lightOnPrimary,
+    onBackground = lightOnBackground
 )
 
 @Composable
 fun ChatXTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme =if (darkTheme){
-        DarkColorScheme
-    } else {
-        LightColorScheme
-    }
+    val colors = if (isDarkTheme) DarkColorPalette else LightColorPalette
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = colors ,
         typography = Typography,
-        shapes = shapes,
         content = content
     )
 }
