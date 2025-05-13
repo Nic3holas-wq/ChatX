@@ -17,7 +17,6 @@ private val DarkColorPalette = darkColorScheme(
     background = darkBackground,
     onPrimary = darkOnPrimary,
     onBackground = darkOnBackground
-
 )
 
 private val LightColorPalette = lightColorScheme(

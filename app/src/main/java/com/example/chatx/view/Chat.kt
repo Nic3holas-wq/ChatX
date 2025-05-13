@@ -226,7 +226,7 @@ fun Chat(navController: NavHostController, userId: String?) {
             ) {
                 items(messagesState.reversed()) { message ->
                     val isMe = message.senderId == currentUserId
-                    val backgroundColor = if (isMe) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary
+                    val backgroundColor = if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                     val alignment = if (isMe) Alignment.CenterEnd else Alignment.CenterStart
 
                     Box(

@@ -65,7 +65,7 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = viewModel(
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     text = "ChatX",
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
