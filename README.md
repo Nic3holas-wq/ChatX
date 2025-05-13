@@ -22,11 +22,11 @@ ChatX is a real-time chat application built with **Kotlin**, **Jetpack Compose**
 
 <!-- You can add screenshots here -->
 <p align="center">
-  <img src="screenshorts/home1.png" width="250" height="300" />
-  <img src="screenshorts/home2.png" width="250" />
-  <img src="screenshorts/startchat.png" width="250" />
-  <img src="screenshorts/chat.png" width="250" />
-  <img src="screenshorts/account.png" width="250" />
+  <img src="screenshorts/home1.png" width="250" height="350" />
+  <img src="screenshorts/home2.png" width="250" height="350"/>
+  <img src="screenshorts/startchat.png" width="250" height="350"/>
+  <img src="screenshorts/chat.png" width="250" height="350"/>
+  <img src="screenshorts/account.png" width="250" height="350"/>
 </p>
 
 ## 📦 Installation
