@@ -47,7 +47,7 @@ fun Themes(navController: NavHostController) {
             Icon(
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .size(20.dp)
+                    .size(30.dp)
                     .clickable(onClick = {navController.popBackStack()}),
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Back Button",
@@ -55,11 +55,10 @@ fun Themes(navController: NavHostController) {
 
             )
             Text(
-                text = "Start New Chat",
+                text = "Themes",
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
             )
         }
         DarkModeSwitch(viewModel = settingsViewModel)

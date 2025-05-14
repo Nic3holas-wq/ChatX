@@ -16,10 +16,14 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
     private val dao = AppDatabase.getInstance(application).settingsDao()
     private val _isDarkMode = MutableStateFlow(false)
     val isDarkMode: StateFlow<Boolean> = _isDarkMode
+    val _isFingerprintEnabled = MutableStateFlow(false)
+    val isFingerprintEnabled: StateFlow<Boolean> = _isFingerprintEnabled
+
     init {
         viewModelScope.launch{
             val settings = dao.getSettings()
             _isDarkMode.value = settings?.isDarkMode ?: false
+            _isFingerprintEnabled.value = settings?.isFingerprintEnabled ?: false
         }
     }
 
@@ -29,5 +33,25 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
             dao.saveSettings(Settings(isDarkMode = enabled))
         }
     }
+
+    fun toggleFingerprint(enabled: Boolean) {
+        _isFingerprintEnabled.value = enabled
+        viewModelScope.launch {
+            val current = dao.getSettings()
+            if (current != null) {
+                dao.saveSettings(
+                    current.copy(isFingerprintEnabled = enabled)
+                )
+            } else {
+                dao.saveSettings(
+                    Settings(
+                        isDarkMode = _isDarkMode.value,
+                        isFingerprintEnabled = enabled
+                    )
+                )
+            }
+        }
+    }
+
 
 }

@@ -6,5 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "settings")
 data class Settings(
     @PrimaryKey val id: Int = 0,
-    val isDarkMode: Boolean
+    val isDarkMode: Boolean,
+    val isFingerprintEnabled: Boolean = false
 )

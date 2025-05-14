@@ -1,46 +1,83 @@
 package com.example.chatx.view
 
+import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.view.animation.OvershootInterpolator
+import androidx.biometric.BiometricPrompt
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import com.example.chatx.R
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.chatx.viewmodel.SettingsViewModel
 import com.example.chatx.viewmodel.SplashViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun SplashScreen(navController: NavController, viewModel: SplashViewModel = viewModel()){
+fun SplashScreen(
+    navController: NavController,
+    viewModel: SplashViewModel = viewModel(),
+    onAuthSuccess: () -> Unit,
+    onAuthFail: () -> Unit,
+    activity: FragmentActivity,
+){
+    val settingsViewModel: SettingsViewModel = viewModel()
+    val isFingerprint by settingsViewModel.isFingerprintEnabled.collectAsState()
+    val context = LocalContext.current
     val scale = remember {
         Animatable(0f)
     }
     val textScale = remember { Animatable(0.8f) }
     val alpha = remember { Animatable(0f) }
     val offsetY = remember { Animatable(40f) }
+
+    fun authenticateWithBiometrics(context: android.content.Context, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val executor = ContextCompat.getMainExecutor(context)
+        val biometricPrompt = BiometricPrompt(
+            activity,
+            executor,
+            object : BiometricPrompt.AuthenticationCallback(){
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    onSuccess()
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    onFailure()
+                }
+
+                override fun onAuthenticationFailed() {
+                    onFailure()
+                }
+            }
+        )
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Fingerprint Authentication")
+            .setSubtitle("Log in using your fingerprint")
+            .setNegativeButtonText("Cancel")
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
+    }
 
     LaunchedEffect(key1 = true) {
         scale.animateTo(
@@ -57,17 +94,26 @@ fun SplashScreen(navController: NavController, viewModel: SplashViewModel = view
         launch{offsetY.animateTo(0f, tween(800))}
         delay(3000L)
         val isLoggedIn = viewModel.isUserLoggedIn()
-        if (isLoggedIn){
-            navController.navigate("home") {
-                popUpTo("splash_screen") { inclusive = true }
-        }
+        if (isLoggedIn && isFingerprint){
+                authenticateWithBiometrics(
+                    context = context,
+                    onSuccess = onAuthSuccess,
+                    onFailure = onAuthFail
+                )
 
-        }else{
-            navController.navigate("signin") {
-                popUpTo("splash_screen") { inclusive = true }
+        } else if (isLoggedIn) {
+            onAuthSuccess()
+        } else {
+            navController.navigate("signin"){
+                popUpTo("splash_screen") {inclusive = true}
             }
         }
-    }
+
+        }
+
+
+
+
     Column  (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
