@@ -28,6 +28,7 @@ ChatX is a real-time chat application built with **Kotlin**, **Jetpack Compose**
   <img src="screenshorts/chat.png" width="250" height="350"/>
   <img src="screenshorts/account.png" width="250" height="350"/>
   <img src="screenshorts/theme.png" width="250" height="350"/>
+  <img src="screenshorts/setting.png" width="250" height="350"/>
 </p>
 
 ## 📦 Installation
